@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Relaxation Training Prediction</title>
+</head>
+<body>
+    <h1>Predict Need for Relaxation Training</h1>
+    <form id="predictForm" method="post">
+        {% csrf_token %}
+        <label>Steps: <input type="number" name="steps" required></label><br>
+        <label>Exercise Time (min): <input type="number" name="exercise_time" required></label><br>
+        <label>Average Heart Rate: <input type="number" name="avg_heart_rate" required></label><br>
+        <label>Max Heart Rate: <input type="number" name="max_heart_rate" required></label><br>
+        <label>Sleep Duration (hours): <input type="number" name="sleep_duration" required></label><br>
+        <label>Fatigue Level (1-10): <input type="number" name="fatigue_level" required></label><br>
+        <label>Height (cm): <input type="number" name="height" required></label><br>
+        <label>Weight (kg): <input type="number" name="weight" required></label><br>
+        <label>Age: <input type="number" name="age" required></label><br>
+        <button type="submit">Predict</button>
+    </form>
+    <p id="result"></p>
+</body>
+</html>
+<script>
+    document.getElementById("predictForm").onsubmit = async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const response = await fetch("{% url 'predict_training' %}", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+            }
+        });
+
+        const data = await response.json();
+        document.getElementById("result").textContent =
+            data.result === 1 ? "Relaxation training is needed." : "No relaxation training needed.";
+    };
+</script>
